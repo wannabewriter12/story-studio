@@ -138,4 +138,16 @@ document.addEventListener("DOMContentLoaded", () => {
     updateWordCount();
   });
 });
+// Auto-hide floating toolbar while typing
+const floatingBar = document.querySelector(".floating-toolbar");
+let typingTimeout;
+
+document.getElementById("editor").addEventListener("input", () => {
+  floatingBar.classList.add("hide");
+
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    floatingBar.classList.remove("hide");
+  }, 600);
+});
 
