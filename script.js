@@ -123,6 +123,12 @@ function setupThemeSelect() {
   const select = document.getElementById("themeSelect");
   if (!select) return;
   select.addEventListener("change", () => {
+      if (!checkPassword()) {
+    document.getElementById("storiesList").innerHTML =
+      "<p>Incorrect password. No stories available.</p>";
+    return;
+  }
+
     const theme = select.value;
     document.body.className = theme;
     localStorage.setItem(THEME_KEY, theme);
