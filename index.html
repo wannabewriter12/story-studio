@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Story Studio</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Styles -->
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="themes.css">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="themes.css" />
 </head>
-
 <body class="theme-pastel">
   <!-- Loader -->
   <div id="loader">
@@ -22,7 +21,11 @@
   </div>
 
   <header class="top-bar">
-    <h1 class="logo">Story Studio</h1>
+    <div class="logo-area">
+      <!-- If you add a logo image, replace logo.png and uncomment -->
+      <!-- <img src="logo.png" alt="Story Studio Logo" class="logo-img" /> -->
+      <span class="logo-text">Story Studio</span>
+    </div>
 
     <div class="top-controls">
       <select id="themeSelect" class="select">
@@ -33,7 +36,7 @@
 
       <button id="backupBtn" class="btn ghost">Backup</button>
       <button id="importBtn" class="btn ghost">Import</button>
-      <input type="file" id="importFile" accept=".json" style="display:none;">
+      <input type="file" id="importFile" accept=".json" style="display:none" />
     </div>
   </header>
 
@@ -51,3 +54,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
