@@ -1,188 +1,134 @@
-// ===============================
-// CONSTANTS
-// ===============================
-const STORAGE_KEY = "ann_stories";
-
-// ===============================
-// LOADER CONTROL
-// ===============================
+// ----------------------
+// LOADER
+// ----------------------
 function hideLoader() {
   const loader = document.getElementById("loader");
-  if (loader) {
-    loader.classList.add("hidden");
-    setTimeout(() => loader.remove(), 400);
-  }
+  if (loader) loader.style.display = "none";
 }
 
-// ===============================
-// ELEMENTS
-// ===============================
-const editor = document.getElementById("editor");
-const statusEl = document.getElementById("status");
-const wordCountEl = document.getElementById("wordCount");
+document.addEventListener("DOMContentLoaded", () => {
+  hideLoader();
+  loadTheme();
+  loadStory();
+  setupToolbar();
+});
 
-// ===============================
-// LOAD STORY
-// ===============================
-const params = new URLSearchParams(window.location.search);
-const storyId = params.get("id");
+// ----------------------
+// THEME
+// ----------------------
+function loadTheme() {
+  const saved = localStorage.getItem("storyTheme") || "theme-minimal";
+  document.body.className = saved;
+}
 
-let stories = [];
-let story = null;
+// ----------------------
+// STORY STORAGE
+// ----------------------
+function loadStories() {
+  return JSON.parse(localStorage.getItem("stories") || "[]");
+}
+
+function saveStories(stories) {
+  localStorage.setItem("stories", JSON.stringify(stories));
+}
+
+// ----------------------
+// LOAD STORY INTO EDITOR
+// ----------------------
+let currentStory = null;
 
 function loadStory() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  stories = raw ? JSON.parse(raw) : [];
-  story = stories.find((s) => s.id === storyId);
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  if (!story) {
+  const stories = loadStories();
+  currentStory = stories.find(s => s.id === id);
+
+  if (!currentStory) {
     alert("Story not found.");
     window.location.href = "index.html";
     return;
   }
 
-  editor.innerHTML = story.content || "";
+  document.getElementById("editor").innerHTML = currentStory.content;
   updateWordCount();
 }
 
-// ===============================
+// ----------------------
 // AUTOSAVE
-// ===============================
-let saveTimer;
+// ----------------------
+function autosave() {
+  const stories = loadStories();
+  const index = stories.findIndex(s => s.id === currentStory.id);
 
-function saveStory() {
-  story.content = editor.innerHTML;
-  const firstLine = editor.innerText.split("\n")[0].trim();
-  story.title = firstLine || "Untitled story";
-  story.updatedAt = new Date().toISOString();
+  if (index !== -1) {
+    stories[index].content = document.getElementById("editor").innerHTML;
+    stories[index].updatedAt = new Date().toISOString();
+    saveStories(stories);
+  }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
-  statusEl.textContent = "Saved";
+  document.getElementById("status").textContent = "Saved";
 }
 
-function scheduleSave() {
-  statusEl.textContent = "Saving...";
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveStory, 500);
-}
+setInterval(autosave, 1000);
 
-// ===============================
+// ----------------------
 // WORD COUNT
-// ===============================
+// ----------------------
 function updateWordCount() {
-  const text = editor.innerText.trim();
+  const text = document.getElementById("editor").innerText.trim();
   const words = text === "" ? 0 : text.split(/\s+/).length;
-  wordCountEl.textContent = words + " words";
+  document.getElementById("wordCount").textContent = `${words} words`;
 }
 
-// ===============================
-// TOOLBAR COMMANDS
-// ===============================
-function setupToolbar() {
-  document.querySelectorAll("[data-cmd]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const cmd = btn.dataset.cmd;
-      document.execCommand(cmd, false, null);
-      editor.focus();
-      scheduleSave();
-      updateWordCount();
-    });
-  });
-
-  const fontFamily = document.getElementById("fontFamily");
-  const fontSize = document.getElementById("fontSize");
-  const colorPicker = document.getElementById("colorPicker");
-
-  if (fontFamily) {
-    fontFamily.addEventListener("change", (e) => {
-      const value = e.target.value;
-      if (value) {
-        document.execCommand("fontName", false, value);
-        editor.focus();
-        scheduleSave();
-        updateWordCount();
-      }
-    });
-  }
-
-  if (fontSize) {
-    fontSize.addEventListener("change", (e) => {
-      const value = e.target.value;
-      if (value) {
-        document.execCommand("fontSize", false, value);
-        editor.focus();
-        scheduleSave();
-        updateWordCount();
-      }
-    });
-  }
-
-  if (colorPicker) {
-    colorPicker.addEventListener("change", (e) => {
-      document.execCommand("foreColor", false, e.target.value);
-      editor.focus();
-      scheduleSave();
-      updateWordCount();
-    });
-  }
-
-  document.querySelectorAll("#colorPalette button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const color = btn.dataset.color;
-      document.execCommand("foreColor", false, color);
-      editor.focus();
-      scheduleSave();
-      updateWordCount();
-    });
-  });
-}
-
-// ===============================
-// DOWNLOAD AS DOCX
-// ===============================
-function setupDownload() {
-  const btn = document.getElementById("downloadDocx");
-  if (!btn) return;
-
-  btn.addEventListener("click", () => {
-    const content = editor.innerHTML;
-
-    const html =
-      `<?xml version="1.0" encoding="UTF-8"?>` +
-      `<html xmlns:o="urn:schemas-microsoft-com:office:office" ` +
-      `xmlns:w="urn:schemas-microsoft-com:office:word" ` +
-      `xmlns="http://www.w3.org/TR/REC-html40">` +
-      `<head><meta charset="utf-8"></head><body>${content}</body></html>`;
-
-    const blob = new Blob([html], {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    });
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = (story.title || "story") + ".docx";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-}
-
-// ===============================
-// EDITOR INPUT
-// ===============================
-function setupEditor() {
-  editor.addEventListener("input", () => {
-    scheduleSave();
-    updateWordCount();
-  });
-}
-
-// ===============================
-// INIT
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-  loadStory();
-  setupToolbar();
-  setupDownload();
-  setupEditor();
-  hideLoader();
+document.getElementById("editor").addEventListener("input", () => {
+  document.getElementById("status").textContent = "Saving...";
+  updateWordCount();
 });
+
+// ----------------------
+// TOOLBAR
+// ----------------------
+function setupToolbar() {
+  document.querySelectorAll("[data-cmd]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.execCommand(btn.dataset.cmd, false, null);
+    });
+  });
+
+  document.getElementById("fontFamily").addEventListener("change", e => {
+    document.execCommand("fontName", false, e.target.value);
+  });
+
+  document.getElementById("fontSize").addEventListener("change", e => {
+    document.execCommand("fontSize", false, e.target.value);
+  });
+
+  document.getElementById("colorPicker").addEventListener("input", e => {
+    document.execCommand("foreColor", false, e.target.value);
+  });
+
+  document.querySelectorAll("#colorPalette button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.execCommand("foreColor", false, btn.dataset.color);
+    });
+  });
+
+  document.getElementById("downloadDocx").addEventListener("click", downloadDocx);
+}
+
+// ----------------------
+// DOWNLOAD DOCX
+// ----------------------
+function downloadDocx() {
+  const content = document.getElementById("editor").innerText;
+  const blob = new Blob([content], { type: "text/plain" });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentStory.title}.txt`;
+  a.click();
+
+  URL.revokeObjectURL(a.href);
+}
+
