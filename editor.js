@@ -70,7 +70,14 @@ function updateWordCount() {
 }
 
 // TOOLBAR
-function setupToolbar() {
+function setupToolbar() {// Floating toolbar buttons
+document.querySelectorAll(".floating-toolbar .fbtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.execCommand(btn.dataset.cmd, false, null);
+    document.getElementById("editor").focus();
+  });
+});
+
   document.querySelectorAll("[data-cmd]").forEach(btn => {
     btn.addEventListener("click", () => {
       document.execCommand(btn.dataset.cmd, false, null);
