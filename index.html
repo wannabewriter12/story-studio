@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ann's Stories</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="themes.css" />
+</head>
+<body class="theme-minimal">
+  <header class="top-bar">
+    <h1>Ann's Story Library</h1>
+    <div class="top-actions">
+      <select id="themeSelect">
+        <option value="theme-minimal">Minimal (B&W)</option>
+        <option value="theme-soft">Soft Aesthetic</option>
+        <option value="theme-dark">Dark Night</option>
+      </select>
+      <button id="newStoryBtn">New Story</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Your Stories</h2>
+      <div id="storiesList" class="story-list empty-state">
+        <p>No stories yet. Click “New Story” to start writing.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
