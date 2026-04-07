@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Story Editor</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Styles -->
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="themes.css">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="themes.css" />
 </head>
-
 <body class="theme-pastel">
   <!-- Loader -->
   <div id="loader">
@@ -50,7 +49,7 @@
         <option value="5">XL</option>
       </select>
 
-      <input type="color" id="colorPicker" class="color-input">
+      <input type="color" id="colorPicker" class="color-input" />
 
       <div id="colorPalette" class="color-palette">
         <button data-color="#ffb3c6" class="swatch"></button>
@@ -68,21 +67,37 @@
   </header>
 
   <main class="editor-main">
-    <div id="editor" 
-      <div class="floating-toolbar">
-  <button data-cmd="bold" class="fbtn"><b>B</b></button>
-  <button data-cmd="italic" class="fbtn"><i>I</i></button>
-  <button data-cmd="underline" class="fbtn"><u>U</u></button>
-  <button data-cmd="strikeThrough" class="fbtn">S</button>
-  <button data-cmd="justifyLeft" class="fbtn">⟸</button>
-  <button data-cmd="justifyCenter" class="fbtn">⟺</button>
-  <button data-cmd="justifyRight" class="fbtn">⟹</button>
-</div>
-
-      class="editor-area" contenteditable="true"></div>
+    <div id="editor" class="editor-area" contenteditable="true"></div>
   </main>
+
+  <!-- Floating frosted-glass toolbar -->
+  <div class="floating-toolbar">
+    <button data-cmd="bold" class="fbtn"><b>B</b></button>
+    <button data-cmd="italic" class="fbtn"><i>I</i></button>
+    <button data-cmd="underline" class="fbtn"><u>U</u></button>
+    <button data-cmd="strikeThrough" class="fbtn">S</button>
+
+    <div class="f-separator"></div>
+
+    <button data-cmd="justifyLeft" class="fbtn">⟸</button>
+    <button data-cmd="justifyCenter" class="fbtn">⟺</button>
+    <button data-cmd="justifyRight" class="fbtn">⟹</button>
+
+    <div class="f-separator"></div>
+
+    <select id="floatFontSize" class="fselect">
+      <option value="">A</option>
+      <option value="2">S</option>
+      <option value="3">M</option>
+      <option value="4">L</option>
+      <option value="5">XL</option>
+    </select>
+
+    <input type="color" id="floatColorPicker" class="fcolor" />
+  </div>
 
   <script src="editor.js"></script>
 </body>
 </html>
+
 
