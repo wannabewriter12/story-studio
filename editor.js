@@ -1,4 +1,6 @@
-// LOADER
+// =========================
+// Loader
+// =========================
 function hideLoader() {
   const loader = document.getElementById("loader");
   if (!loader) return;
@@ -8,13 +10,17 @@ function hideLoader() {
   }, 300);
 }
 
-// THEME
+// =========================
+// Theme
+// =========================
 function loadTheme() {
   const saved = localStorage.getItem("storyTheme") || "theme-pastel";
   document.body.className = saved;
 }
 
-// STORAGE
+// =========================
+// Storage
+// =========================
 function loadStories() {
   return JSON.parse(localStorage.getItem("stories") || "[]");
 }
@@ -25,7 +31,49 @@ function saveStories(stories) {
 
 let currentStory = null;
 
-// LOAD STORY
+// =========================
+// Local synonyms (hybrid base)
+// =========================
+const localSynonyms = {
+  green: "verdant",
+  nice: "pleasant",
+  big: "immense",
+  small: "minute",
+  very: "extremely",
+  sad: "melancholy",
+  happy: "elated",
+  pretty: "beautiful",
+  bad: "poor",
+  good: "excellent"
+};
+
+// =========================
+// AI suggestion (fallback)
+// =========================
+// NOTE: Replace YOUR_API_ENDPOINT_HERE with your real endpoint if you use AI.
+// If you don't have one yet, this will just return null and local synonyms will still work.
+async function getAISuggestion(text) {
+  try {
+    const response = await fetch("YOUR_API_ENDPOINT_HERE", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: `Rewrite this phrase to be more vivid and descriptive: "${text}"`,
+        max_tokens: 20
+      })
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.suggestion || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// =========================
+// Load story into editor
+// =========================
 function loadStory() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
@@ -42,9 +90,12 @@ function loadStory() {
   const editor = document.getElementById("editor");
   editor.innerHTML = currentStory.content || "";
   updateWordCount();
+  scanForSuggestions(); // initial scan
 }
 
-// AUTOSAVE
+// =========================
+// Autosave
+// =========================
 function autosave() {
   if (!currentStory) return;
 
@@ -66,7 +117,9 @@ function autosave() {
 
 setInterval(autosave, 1200);
 
-// WORD COUNT
+// =========================
+// Word count
+// =========================
 function updateWordCount() {
   const editor = document.getElementById("editor");
   const text = editor.innerText.trim();
@@ -75,22 +128,51 @@ function updateWordCount() {
   if (wc) wc.textContent = `${words} words`;
 }
 
-// TOOLBAR (top + floating)
+// =========================
+// Suggestion scanner
+// =========================
+function scanForSuggestions() {
+  const editor = document.getElementById("editor");
+  if (!editor) return;
+
+  let html = editor.innerHTML;
+
+  // Remove old suggestion spans
+  html = html.replace(/<span class="suggestion"[^>]*>(.*?)<\/span>/gi, "$1");
+
+  // Add new suggestion spans for local synonyms
+  Object.keys(localSynonyms).forEach((word) => {
+    const regex = new RegExp(`\\b${word}\\b`, "gi");
+    html = html.replace(regex, (match) => {
+      // If the synonym is the same as the word, we still wrap it
+      // so AI can upgrade it later.
+      const suggestion = localSynonyms[word] || match;
+      return `<span class="suggestion" data-suggestion="${suggestion}">${match}</span>`;
+    });
+  });
+
+  editor.innerHTML = html;
+}
+
+// =========================
+// Toolbar setup (top + floating)
+// =========================
 function setupToolbar() {
   const editor = document.getElementById("editor");
 
   // Top toolbar buttons
   document.querySelectorAll("[data-cmd]").forEach((btn) => {
-    if (btn.closest(".floating-toolbar")) return;
+    if (btn.closest(".floating-toolbar")) return; // floating handled separately
     btn.addEventListener("click", () => {
       const cmd = btn.getAttribute("data-cmd");
       if (!cmd) return;
       document.execCommand(cmd, false, null);
       editor.focus();
+      scanForSuggestions();
     });
   });
 
-  // Font family
+  // Font family (top)
   const fontFamily = document.getElementById("fontFamily");
   if (fontFamily) {
     fontFamily.addEventListener("change", (e) => {
@@ -98,10 +180,11 @@ function setupToolbar() {
       if (!value) return;
       document.execCommand("fontName", false, value);
       editor.focus();
+      scanForSuggestions();
     });
   }
 
-  // Font size
+  // Font size (top)
   const fontSize = document.getElementById("fontSize");
   if (fontSize) {
     fontSize.addEventListener("change", (e) => {
@@ -109,25 +192,28 @@ function setupToolbar() {
       if (!value) return;
       document.execCommand("fontSize", false, value);
       editor.focus();
+      scanForSuggestions();
     });
   }
 
-  // Color picker
+  // Color picker (top)
   const colorPicker = document.getElementById("colorPicker");
   if (colorPicker) {
     colorPicker.addEventListener("input", (e) => {
       document.execCommand("foreColor", false, e.target.value);
       editor.focus();
+      scanForSuggestions();
     });
   }
 
-  // Palette
+  // Palette (top)
   document.querySelectorAll("#colorPalette .swatch").forEach((btn) => {
     btn.addEventListener("click", () => {
       const color = btn.getAttribute("data-color");
       if (!color) return;
       document.execCommand("foreColor", false, color);
       editor.focus();
+      scanForSuggestions();
     });
   });
 
@@ -138,6 +224,7 @@ function setupToolbar() {
       if (!cmd) return;
       document.execCommand(cmd, false, null);
       editor.focus();
+      scanForSuggestions();
     });
   });
 
@@ -149,6 +236,7 @@ function setupToolbar() {
       if (!value) return;
       document.execCommand("fontSize", false, value);
       editor.focus();
+      scanForSuggestions();
     });
   }
 
@@ -158,10 +246,11 @@ function setupToolbar() {
     floatColorPicker.addEventListener("input", (e) => {
       document.execCommand("foreColor", false, e.target.value);
       editor.focus();
+      scanForSuggestions();
     });
   }
 
-  // Download
+  // Download (plain text)
   const downloadBtn = document.getElementById("downloadDocx");
   if (downloadBtn) {
     downloadBtn.addEventListener("click", () => {
@@ -178,7 +267,9 @@ function setupToolbar() {
   }
 }
 
-// FLOATING TOOLBAR AUTO-HIDE
+// =========================
+// Floating toolbar behavior
+// =========================
 function setupFloatingToolbarBehavior() {
   const editor = document.getElementById("editor");
   const floatingBar = document.querySelector(".floating-toolbar");
@@ -207,12 +298,46 @@ function setupFloatingToolbarBehavior() {
     typingTimeout = setTimeout(() => {
       showBar();
     }, 600);
+
+    // Scan for suggestions as you type
+    scanForSuggestions();
   });
 
+  // Show initially
   showBar();
 }
 
-// INIT
+// =========================
+// Hover → AI upgrade
+// =========================
+document.addEventListener("mouseover", async (e) => {
+  if (!e.target.classList.contains("suggestion")) return;
+
+  const span = e.target;
+  const original = span.innerText.trim();
+  const currentSuggestion = span.getAttribute("data-suggestion") || original;
+
+  // If local suggestion is basically the same as original, try AI
+  if (currentSuggestion.toLowerCase() === original.toLowerCase()) {
+    const ai = await getAISuggestion(original);
+    if (ai) span.setAttribute("data-suggestion", ai);
+  }
+});
+
+// =========================
+// Click to apply suggestion
+// =========================
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("suggestion")) return;
+
+  const span = e.target;
+  const suggestion = span.getAttribute("data-suggestion") || span.innerText;
+  span.outerHTML = suggestion;
+});
+
+// =========================
+// Init
+// =========================
 document.addEventListener("DOMContentLoaded", () => {
   hideLoader();
   loadTheme();
@@ -220,5 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupToolbar();
   setupFloatingToolbarBehavior();
   updateWordCount();
+  scanForSuggestions();
 });
 
