@@ -2,35 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ann's Stories</title>
+  <title>Story Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="themes.css" />
 </head>
 <body class="theme-minimal">
-  <header class="top-bar">
-    <h1>Ann's Story Library</h1>
-  <div class="top-actions">
-  <select id="themeSelect">...</select>
-  <button id="backupBtn">Download Backup</button>
-  <button id="newStoryBtn">New Story</button>
-</div>
+  <header>
+    <h1>Story Studio</h1>
+    <div class="top-actions">
       <select id="themeSelect">
-        <option value="theme-minimal">Minimal (B&W)</option>
-        <option value="theme-soft">Soft Aesthetic</option>
-        <option value="theme-dark">Dark Night</option>
+        <option value="theme-minimal">Minimal</option>
+        <option value="theme-dark">Dark</option>
+        <option value="theme-soft">Soft</option>
       </select>
+
+      <button id="backupBtn">Download Backup</button>
+      <button id="importBtn">Import Backup</button>
       <button id="newStoryBtn">New Story</button>
     </div>
   </header>
 
-  <main class="container">
-    <section>
-      <h2>Your Stories</h2>
-      <div id="storiesList" class="story-list empty-state">
-        <p>No stories yet. Click “New Story” to start writing.</p>
-      </div>
-    </section>
+  <main>
+    <div id="storiesList"></div>
   </main>
+
+  <input type="file" id="importFile" accept=".json" style="display:none;" />
 
   <script src="script.js"></script>
 </body>
