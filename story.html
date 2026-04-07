@@ -68,7 +68,18 @@
   </header>
 
   <main class="editor-main">
-    <div id="editor" class="editor-area" contenteditable="true"></div>
+    <div id="editor" 
+      <div class="floating-toolbar">
+  <button data-cmd="bold" class="fbtn"><b>B</b></button>
+  <button data-cmd="italic" class="fbtn"><i>I</i></button>
+  <button data-cmd="underline" class="fbtn"><u>U</u></button>
+  <button data-cmd="strikeThrough" class="fbtn">S</button>
+  <button data-cmd="justifyLeft" class="fbtn">⟸</button>
+  <button data-cmd="justifyCenter" class="fbtn">⟺</button>
+  <button data-cmd="justifyRight" class="fbtn">⟹</button>
+</div>
+
+      class="editor-area" contenteditable="true"></div>
   </main>
 
   <script src="editor.js"></script>
