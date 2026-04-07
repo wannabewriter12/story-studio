@@ -1,86 +1,283 @@
-/* ================================
-   GLOBAL RESET + BASE
-================================ */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
-  font-family: Inter, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  transition: background 0.3s, color 0.3s;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background: #fdfbff;
+  color: #222;
+  min-height: 100vh;
 }
 
-/* ================================
-   THEMES
-================================ */
-body.theme-minimal {
-  --bg: #f7f7f7;
-  --text: #222;
-  --card-bg: #fff;
-  --toolbar-bg: #ffffff;
-}
-
-body.theme-soft {
-  --bg: #faf7ff;
-  --text: #333;
-  --card-bg: #ffffff;
-  --toolbar-bg: #ffffff;
-}
-
-body.theme-dark {
-  --bg: #1e1e1e;
-  --text: #eaeaea;
-  --card-bg: #2a2a2a;
-  --toolbar-bg: #2a2a2a;
-}
-
-/* ================================
-   HEADER (INDEX PAGE)
-================================ */
-header {
-  padding: 20px;
-  text-align: center;
-}
-
-.top-actions {
-  margin-top: 15px;
+/* Loader */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(250, 246, 255, 0.9);
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
+  z-index: 999;
+  transition: opacity 0.3s ease;
 }
 
-.top-actions button,
-.top-actions select {
-  padding: 8px 14px;
-  border-radius: 8px;
+#loader.fade-out {
+  opacity: 0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin: 0 4px;
+  background: #c8b5ff;
+  animation: bounce 0.8s infinite alternate;
+}
+
+.dot2 { animation-delay: 0.15s; }
+.dot3 { animation-delay: 0.3s; }
+
+@keyframes bounce {
+  from { transform: translateY(0); opacity: 0.6; }
+  to { transform: translateY(-8px); opacity: 1; }
+}
+
+/* Buttons, selects */
+.btn {
   border: none;
-  background: var(--card-bg);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
 }
 
-.top-actions button:hover {
-  transform: translateY(-2px);
+.btn.primary {
+  background: #c8b5ff;
+  color: #241b3b;
+  box-shadow: 0 2px 6px rgba(120, 90, 200, 0.25);
 }
 
-/* ================================
-   STORY CARDS (INDEX PAGE)
-================================ */
-#storiesList {
-  max-width: 800px;
-  margin: 30px auto;
+.btn.primary:hover {
+  background: #b39afc;
+  transform: translateY(-1px);
+}
+
+.btn.ghost {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(180, 160, 230, 0.4);
+}
+
+.btn.small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.btn.icon {
+  padding: 0.25rem 0.5rem;
+}
+
+.select {
+  border-radius: 999px;
+  border: 1px solid rgba(180, 160, 230, 0.5);
+  padding: 0.3rem 0.7rem;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+}
+
+.select.small {
+  font-size: 0.8rem;
+}
+
+.color-input {
+  border-radius: 999px;
+  border: 1px solid rgba(180, 160, 230, 0.5);
+  padding: 0.1rem;
+  background: white;
+}
+
+/* Layout */
+.top-bar,
+.editor-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1.4rem;
+  border-bottom: 1px solid rgba(210, 190, 240, 0.6);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+}
+
+.top-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.main-layout {
+  padding: 1.4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 10px 30px rgba(180, 150, 230, 0.15);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.story-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 0.7rem;
 }
 
 .story-card {
-  background: var(--card-bg);
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(210, 190, 240, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.story-main h3 {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.story-snippet {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.story-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.story-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.empty {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Editor page */
+.editor-top-bar .left,
+.editor-top-bar .center,
+.editor-top-bar .right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editor-top-bar .center {
+  flex: 1;
+  justify-content: center;
+}
+
+.editor-top-bar .right {
+  justify-content: flex-end;
+}
+
+.back-link {
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: #5b4a9a;
+}
+
+.editor-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(200, 181, 255, 0.2);
+  font-size: 0.75rem;
+}
+
+.word-count {
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.editor-main {
+  max-width: 900px;
+  margin: 1rem auto;
+  padding: 0 1.4rem 1.4rem;
+}
+
+.editor-area {
+  min-height: 60vh;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(210, 190, 240, 0.7);
+  box-shadow: 0 10px 30px rgba(180, 150, 230, 0.15);
+  outline: none;
+  line-height: 1.6;
+  font-size: 0.98rem;
+}
+
+/* Color palette */
+.color-palette {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .top-bar,
+  .editor-top-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .editor-top-bar .center {
+    order: 3;
+  }
+
+  .editor-top-bar .right {
+    order: 2;
+  }
+
+  .main-layout,
+  .editor-main {
+    padding: 1rem;
+  }
+}
