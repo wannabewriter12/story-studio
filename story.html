@@ -12,7 +12,9 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="themes.css" />
 </head>
+
 <body class="theme-pastel">
+
   <!-- Loader -->
   <div id="loader">
     <div class="dot dot1"></div>
@@ -20,6 +22,7 @@
     <div class="dot dot3"></div>
   </div>
 
+  <!-- Top Editor Bar -->
   <header class="editor-top-bar">
     <div class="left">
       <a href="index.html" class="back-link">← Stories</a>
@@ -66,11 +69,12 @@
     </div>
   </header>
 
+  <!-- Main Editor Area -->
   <main class="editor-main">
     <div id="editor" class="editor-area" contenteditable="true"></div>
   </main>
 
-  <!-- Floating frosted-glass toolbar -->
+  <!-- Floating Frosted Toolbar -->
   <div class="floating-toolbar">
     <button data-cmd="bold" class="fbtn"><b>B</b></button>
     <button data-cmd="italic" class="fbtn"><i>I</i></button>
@@ -96,6 +100,7 @@
     <input type="color" id="floatColorPicker" class="fcolor" />
   </div>
 
+  <!-- Script -->
   <script src="editor.js"></script>
 </body>
 </html>
