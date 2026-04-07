@@ -1,8 +1,11 @@
 // LOADER
 function hideLoader() {
   const loader = document.getElementById("loader");
-  if (loader) loader.classList.add("fade-out");
-  setTimeout(() => loader && (loader.style.display = "none"), 300);
+  if (!loader) return;
+  loader.classList.add("fade-out");
+  setTimeout(() => {
+    loader.style.display = "none";
+  }, 300);
 }
 
 // THEME
@@ -28,7 +31,7 @@ function loadStory() {
   const id = params.get("id");
 
   const stories = loadStories();
-  currentStory = stories.find(s => s.id === id);
+  currentStory = stories.find((s) => s.id === id);
 
   if (!currentStory) {
     alert("Story not found.");
@@ -46,7 +49,7 @@ function autosave() {
   if (!currentStory) return;
 
   const stories = loadStories();
-  const index = stories.findIndex(s => s.id === currentStory.id);
+  const index = stories.findIndex((s) => s.id === currentStory.id);
   if (index === -1) return;
 
   const editor = document.getElementById("editor");
@@ -57,73 +60,157 @@ function autosave() {
   saveStories(stories);
   currentStory = stories[index];
 
-  document.getElementById("status").textContent = "Saved";
+  const status = document.getElementById("status");
+  if (status) status.textContent = "Saved";
 }
 
 setInterval(autosave, 1200);
 
 // WORD COUNT
 function updateWordCount() {
-  const text = document.getElementById("editor").innerText.trim();
+  const editor = document.getElementById("editor");
+  const text = editor.innerText.trim();
   const words = text ? text.split(/\s+/).length : 0;
-  document.getElementById("wordCount").textContent = `${words} words`;
+  const wc = document.getElementById("wordCount");
+  if (wc) wc.textContent = `${words} words`;
 }
 
-// TOOLBAR
-function setupToolbar() {// Floating toolbar buttons
-document.querySelectorAll(".floating-toolbar .fbtn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.execCommand(btn.dataset.cmd, false, null);
-    document.getElementById("editor").focus();
-  });
-});
+// TOOLBAR (top + floating)
+function setupToolbar() {
+  const editor = document.getElementById("editor");
 
-  document.querySelectorAll("[data-cmd]").forEach(btn => {
+  // Top toolbar buttons
+  document.querySelectorAll("[data-cmd]").forEach((btn) => {
+    if (btn.closest(".floating-toolbar")) return; // floating handled separately
     btn.addEventListener("click", () => {
-      document.execCommand(btn.dataset.cmd, false, null);
-      document.getElementById("editor").focus();
+      const cmd = btn.getAttribute("data-cmd");
+      if (!cmd) return;
+      document.execCommand(cmd, false, null);
+      editor.focus();
     });
   });
 
-  document.getElementById("fontFamily").addEventListener("change", e => {
-    if (!e.target.value) return;
-    document.execCommand("fontName", false, e.target.value);
-    document.getElementById("editor").focus();
-  });
+  // Font family (top)
+  const fontFamily = document.getElementById("fontFamily");
+  if (fontFamily) {
+    fontFamily.addEventListener("change", (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      document.execCommand("fontName", false, value);
+      editor.focus();
+    });
+  }
 
-  document.getElementById("fontSize").addEventListener("change", e => {
-    if (!e.target.value) return;
-    document.execCommand("fontSize", false, e.target.value);
-    document.getElementById("editor").focus();
-  });
+  // Font size (top)
+  const fontSize = document.getElementById("fontSize");
+  if (fontSize) {
+    fontSize.addEventListener("change", (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      document.execCommand("fontSize", false, value);
+      editor.focus();
+    });
+  }
 
-  document.getElementById("colorPicker").addEventListener("input", e => {
-    document.execCommand("foreColor", false, e.target.value);
-    document.getElementById("editor").focus();
-  });
+  // Color picker (top)
+  const colorPicker = document.getElementById("colorPicker");
+  if (colorPicker) {
+    colorPicker.addEventListener("input", (e) => {
+      document.execCommand("foreColor", false, e.target.value);
+      editor.focus();
+    });
+  }
 
-  document.querySelectorAll("#colorPalette .swatch").forEach(btn => {
+  // Palette (top)
+  document.querySelectorAll("#colorPalette .swatch").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.execCommand("foreColor", false, btn.dataset.color);
-      document.getElementById("editor").focus();
+      const color = btn.getAttribute("data-color");
+      if (!color) return;
+      document.execCommand("foreColor", false, color);
+      editor.focus();
     });
   });
 
-  document.getElementById("downloadDocx").addEventListener("click", downloadDocx);
+  // Floating toolbar buttons
+  document.querySelectorAll(".floating-toolbar .fbtn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const cmd = btn.getAttribute("data-cmd");
+      if (!cmd) return;
+      document.execCommand(cmd, false, null);
+      editor.focus();
+    });
+  });
+
+  // Floating font size
+  const floatFontSize = document.getElementById("floatFontSize");
+  if (floatFontSize) {
+    floatFontSize.addEventListener("change", (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      document.execCommand("fontSize", false, value);
+      editor.focus();
+    });
+  }
+
+  // Floating color picker
+  const floatColorPicker = document.getElementById("floatColorPicker");
+  if (floatColorPicker) {
+    floatColorPicker.addEventListener("input", (e) => {
+      document.execCommand("foreColor", false, e.target.value);
+      editor.focus();
+    });
+  }
+
+  // Download (plain text)
+  const downloadBtn = document.getElementById("downloadDocx");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      const content = editor.innerText;
+      const title = (currentStory && currentStory.title) || "story";
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
 }
 
-// DOWNLOAD (plain text)
-function downloadDocx() {
-  const content = document.getElementById("editor").innerText;
-  const title = (currentStory && currentStory.title) || "story";
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
+// FLOATING TOOLBAR AUTO-HIDE
+function setupFloatingToolbarBehavior() {
+  const editor = document.getElementById("editor");
+  const floatingBar = document.querySelector(".floating-toolbar");
+  if (!editor || !floatingBar) return;
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${title}.txt`;
-  a.click();
-  URL.revokeObjectURL(url);
+  let typingTimeout;
+
+  function showBar() {
+    floatingBar.classList.remove("hide");
+  }
+
+  function hideBar() {
+    floatingBar.classList.add("hide");
+  }
+
+  editor.addEventListener("focus", showBar);
+  editor.addEventListener("blur", hideBar);
+
+  editor.addEventListener("input", () => {
+    hideBar();
+    const status = document.getElementById("status");
+    if (status) status.textContent = "Saving...";
+    updateWordCount();
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      showBar();
+    }, 600);
+  });
+
+  // Show initially when page loads
+  showBar();
 }
 
 // INIT
@@ -132,22 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTheme();
   loadStory();
   setupToolbar();
-
-  document.getElementById("editor").addEventListener("input", () => {
-    document.getElementById("status").textContent = "Saving...";
-    updateWordCount();
-  });
-});
-// Auto-hide floating toolbar while typing
-const floatingBar = document.querySelector(".floating-toolbar");
-let typingTimeout;
-
-document.getElementById("editor").addEventListener("input", () => {
-  floatingBar.classList.add("hide");
-
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    floatingBar.classList.remove("hide");
-  }, 600);
+  setupFloatingToolbarBehavior();
+  updateWordCount();
 });
 
