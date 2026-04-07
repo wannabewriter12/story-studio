@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Story Editor</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="themes.css" />
+</head>
+<body class="theme-minimal">
+  <header class="top-bar">
+    <div class="left">
+      <a href="index.html" class="back-link">← Library</a>
+      <input id="titleInput" class="title-input" placeholder="Untitled story" />
+    </div>
+    <div class="top-actions">
+      <select id="themeSelect">
+        <option value="theme-minimal">Minimal (B&W)</option>
+        <option value="theme-soft">Soft Aesthetic</option>
+        <option value="theme-dark">Dark Night</option>
+      </select>
+      <span id="status" class="status-indicator">Saved</span>
+    </div>
+  </header>
+
+  <main class="editor-container">
+    <textarea id="editor" placeholder="Start writing your story here..."></textarea>
+  </main>
+
+  <script src="editor.js"></script>
+</body>
+</html>
