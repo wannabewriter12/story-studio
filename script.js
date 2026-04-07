@@ -1,10 +1,33 @@
+// ===============================
+// 🔐 PASSWORD + STORAGE SETTINGS
+// ===============================
+const STORAGE_KEY = "ann_stories";
+const THEME_KEY = "ann_theme";
 const PASSWORD_KEY = "ann_password";
 
-// Ask for password before loading stories
+// Load stories from localStorage
+function loadStories() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+// Save stories to localStorage
+function saveStories(stories) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+}
+
+// ===============================
+// 🔐 PASSWORD SYSTEM
+// ===============================
 function checkPassword() {
   const saved = localStorage.getItem(PASSWORD_KEY);
 
-  // If no password set yet, ask user to create one
+  // If no password exists, create one
   if (!saved) {
     const newPass = prompt("Create a password to lock your stories:");
     if (newPass) {
@@ -20,24 +43,29 @@ function checkPassword() {
   return entered === saved;
 }
 
-// Key for localStorage
-const STORAGE_KEY = "ann_stories";
-const THEME_KEY = "ann_theme";
-
-function loadStories() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+// ===============================
+// 🎨 THEME SYSTEM
+// ===============================
+function applySavedTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || "theme-minimal";
+  document.body.className = saved;
+  const select = document.getElementById("themeSelect");
+  if (select) select.value = saved;
 }
 
-function saveStories(stories) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+function setupThemeSelect() {
+  const select = document.getElementById("themeSelect");
+  if (!select) return;
+  select.addEventListener("change", () => {
+    const theme = select.value;
+    document.body.className = theme;
+    localStorage.setItem(THEME_KEY, theme);
+  });
 }
 
+// ===============================
+// 📝 STORY LIST RENDERING
+// ===============================
 function renderStories() {
   const stories = loadStories();
   const list = document.getElementById("storiesList");
@@ -63,7 +91,8 @@ function renderStories() {
 
     const preview = document.createElement("p");
     preview.textContent =
-      story.content?.slice(0, 120).trim() || "No content yet.";
+      story.content?.replace(/<[^>]*>/g, "").slice(0, 120).trim() ||
+      "No content yet.";
 
     const footer = document.createElement("div");
     footer.className = "story-card-footer";
@@ -93,6 +122,9 @@ function renderStories() {
   });
 }
 
+// ===============================
+// ➕ CREATE NEW STORY
+// ===============================
 function createNewStory() {
   const stories = loadStories();
   const id = crypto.randomUUID();
@@ -112,32 +144,43 @@ function createNewStory() {
   window.location.href = `story.html?id=${encodeURIComponent(id)}`;
 }
 
-function applySavedTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || "theme-minimal";
-  document.body.className = saved;
-  const select = document.getElementById("themeSelect");
-  if (select) select.value = saved;
+// ===============================
+// 💾 BACKUP DOWNLOAD
+// ===============================
+function setupBackupButton() {
+  const backupBtn = document.getElementById("backupBtn");
+  if (!backupBtn) return;
+
+  backupBtn.addEventListener("click", () => {
+    const stories = loadStories();
+    const blob = new Blob([JSON.stringify(stories, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ann_stories_backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
 }
 
-function setupThemeSelect() {
-  const select = document.getElementById("themeSelect");
-  if (!select) return;
-  select.addEventListener("change", () => {
-      if (!checkPassword()) {
+// ===============================
+// 🚀 PAGE INITIALIZATION
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔐 PASSWORD CHECK
+  if (!checkPassword()) {
     document.getElementById("storiesList").innerHTML =
       "<p>Incorrect password. No stories available.</p>";
     return;
   }
 
-    const theme = select.value;
-    document.body.className = theme;
-    localStorage.setItem(THEME_KEY, theme);
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
   applySavedTheme();
   setupThemeSelect();
+  setupBackupButton();
   renderStories();
 
   const newBtn = document.getElementById("newStoryBtn");
