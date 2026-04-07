@@ -1,140 +1,90 @@
-// ===============================
-// CONSTANTS
-// ===============================
-const STORAGE_KEY = "ann_stories";
-const THEME_KEY = "ann_theme";
-const PASSWORD_KEY = "ann_password";
-
-// ===============================
-// LOADER CONTROL
-// ===============================
+// ----------------------
+// LOADER
+// ----------------------
 function hideLoader() {
   const loader = document.getElementById("loader");
-  if (loader) {
-    loader.classList.add("hidden");
-    setTimeout(() => loader.remove(), 400);
-  }
+  if (loader) loader.style.display = "none";
 }
 
-// ===============================
-// STORAGE HELPERS
-// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  hideLoader();
+  loadTheme();
+  renderStories();
+
+  document.getElementById("newStoryBtn").addEventListener("click", createNewStory);
+  document.getElementById("backupBtn").addEventListener("click", downloadBackup);
+  document.getElementById("importBtn").addEventListener("click", () =>
+    document.getElementById("importFile").click()
+  );
+  document.getElementById("importFile").addEventListener("change", importBackup);
+  document.getElementById("themeSelect").addEventListener("change", changeTheme);
+});
+
+// ----------------------
+// THEME SYSTEM
+// ----------------------
+function loadTheme() {
+  const saved = localStorage.getItem("storyTheme") || "theme-minimal";
+  document.body.className = saved;
+  document.getElementById("themeSelect").value = saved;
+}
+
+function changeTheme() {
+  const theme = document.getElementById("themeSelect").value;
+  document.body.className = theme;
+  localStorage.setItem("storyTheme", theme);
+}
+
+// ----------------------
+// STORY STORAGE
+// ----------------------
 function loadStories() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+  return JSON.parse(localStorage.getItem("stories") || "[]");
 }
 
 function saveStories(stories) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+  localStorage.setItem("stories", JSON.stringify(stories));
 }
 
-// ===============================
-// PASSWORD SYSTEM
-// ===============================
-function checkPassword() {
-  const saved = localStorage.getItem(PASSWORD_KEY);
-
-  if (!saved) {
-    const newPass = prompt("Create a password to lock your stories:");
-    if (newPass) {
-      localStorage.setItem(PASSWORD_KEY, newPass);
-      alert("Password set.");
-      return true;
-    }
-    return false;
-  }
-
-  const entered = prompt("Enter your story password:");
-  if (entered === saved) return true;
-
-  alert("Incorrect password.");
-  return false;
-}
-
-// ===============================
-// THEMES
-// ===============================
-function applySavedTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || "theme-minimal";
-  document.body.className = saved;
-  const select = document.getElementById("themeSelect");
-  if (select) select.value = saved;
-}
-
-function setupThemeSelect() {
-  const select = document.getElementById("themeSelect");
-  if (!select) return;
-
-  select.addEventListener("change", () => {
-    const theme = select.value;
-    document.body.className = theme;
-    localStorage.setItem(THEME_KEY, theme);
-  });
-}
-
-// ===============================
-// STORY LIST RENDERING
-// ===============================
+// ----------------------
+// RENDER STORY LIST
+// ----------------------
 function renderStories() {
-  const stories = loadStories();
   const list = document.getElementById("storiesList");
+  const stories = loadStories();
+
   list.innerHTML = "";
 
-  if (!stories.length) {
-    list.innerHTML = "<p>No stories yet. Click “New Story”.</p>";
+  if (stories.length === 0) {
+    list.innerHTML = "<p>No stories yet.</p>";
     return;
   }
 
-  stories
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .forEach((story) => {
-      const card = document.createElement("div");
-      card.className = "story-card";
+  stories.forEach(story => {
+    const item = document.createElement("div");
+    item.className = "story-item";
+    item.innerHTML = `
+      <h3>${story.title}</h3>
+      <p>${new Date(story.updatedAt).toLocaleString()}</p>
+      <button data-id="${story.id}" class="open-btn">Open</button>
+      <button data-id="${story.id}" class="delete-btn">Delete</button>
+    `;
 
-      card.addEventListener("click", () => {
-        window.location.href = `story.html?id=${encodeURIComponent(story.id)}`;
-      });
-
-      const title = document.createElement("h3");
-      title.textContent = story.title || "Untitled story";
-
-      const preview = document.createElement("p");
-      preview.textContent =
-        (story.content || "").replace(/<[^>]*>/g, "").slice(0, 120) ||
-        "No content yet.";
-
-      const meta = document.createElement("div");
-      meta.className = "story-meta";
-      meta.textContent = new Date(story.updatedAt).toLocaleString();
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Delete";
-      deleteBtn.className = "deleteBtn";
-      deleteBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!confirm("Delete this story?")) return;
-        const remaining = loadStories().filter((s) => s.id !== story.id);
-        saveStories(remaining);
-        renderStories();
-      });
-
-      card.appendChild(title);
-      card.appendChild(preview);
-      card.appendChild(meta);
-      card.appendChild(deleteBtn);
-
-      list.appendChild(card);
+    item.querySelector(".open-btn").addEventListener("click", () => {
+      window.location.href = `story.html?id=${encodeURIComponent(story.id)}`;
     });
+
+    item.querySelector(".delete-btn").addEventListener("click", () => {
+      deleteStory(story.id);
+    });
+
+    list.appendChild(item);
+  });
 }
 
-// ===============================
-// NEW STORY
-// ===============================
+// ----------------------
+// CREATE NEW STORY
+// ----------------------
 function createNewStory() {
   const stories = loadStories();
   const id = crypto.randomUUID();
@@ -145,7 +95,7 @@ function createNewStory() {
     title: "Untitled story",
     content: "",
     createdAt: now,
-    updatedAt: now,
+    updatedAt: now
   };
 
   stories.push(newStory);
@@ -153,4 +103,46 @@ function createNewStory() {
 
   window.location.href = `story.html?id=${encodeURIComponent(id)}`;
 }
-hideLoader();
+
+// ----------------------
+// DELETE STORY
+// ----------------------
+function deleteStory(id) {
+  let stories = loadStories();
+  stories = stories.filter(s => s.id !== id);
+  saveStories(stories);
+  renderStories();
+}
+
+// ----------------------
+// BACKUP / IMPORT
+// ----------------------
+function downloadBackup() {
+  const data = localStorage.getItem("stories") || "[]";
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "stories-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const stories = JSON.parse(reader.result);
+      saveStories(stories);
+      renderStories();
+    } catch {
+      alert("Invalid backup file.");
+    }
+  };
+  reader.readAsText(file);
+}
