@@ -1,3 +1,25 @@
+const PASSWORD_KEY = "ann_password";
+
+// Ask for password before loading stories
+function checkPassword() {
+  const saved = localStorage.getItem(PASSWORD_KEY);
+
+  // If no password set yet, ask user to create one
+  if (!saved) {
+    const newPass = prompt("Create a password to lock your stories:");
+    if (newPass) {
+      localStorage.setItem(PASSWORD_KEY, newPass);
+      alert("Password set! Don't forget it.");
+      return true;
+    }
+    return false;
+  }
+
+  // If password exists, ask user to enter it
+  const entered = prompt("Enter your story password:");
+  return entered === saved;
+}
+
 // Key for localStorage
 const STORAGE_KEY = "ann_stories";
 const THEME_KEY = "ann_theme";
