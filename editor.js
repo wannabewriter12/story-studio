@@ -81,7 +81,7 @@ function setupToolbar() {
 
   // Top toolbar buttons
   document.querySelectorAll("[data-cmd]").forEach((btn) => {
-    if (btn.closest(".floating-toolbar")) return; // floating handled separately
+    if (btn.closest(".floating-toolbar")) return;
     btn.addEventListener("click", () => {
       const cmd = btn.getAttribute("data-cmd");
       if (!cmd) return;
@@ -90,7 +90,7 @@ function setupToolbar() {
     });
   });
 
-  // Font family (top)
+  // Font family
   const fontFamily = document.getElementById("fontFamily");
   if (fontFamily) {
     fontFamily.addEventListener("change", (e) => {
@@ -101,7 +101,7 @@ function setupToolbar() {
     });
   }
 
-  // Font size (top)
+  // Font size
   const fontSize = document.getElementById("fontSize");
   if (fontSize) {
     fontSize.addEventListener("change", (e) => {
@@ -112,7 +112,7 @@ function setupToolbar() {
     });
   }
 
-  // Color picker (top)
+  // Color picker
   const colorPicker = document.getElementById("colorPicker");
   if (colorPicker) {
     colorPicker.addEventListener("input", (e) => {
@@ -121,7 +121,7 @@ function setupToolbar() {
     });
   }
 
-  // Palette (top)
+  // Palette
   document.querySelectorAll("#colorPalette .swatch").forEach((btn) => {
     btn.addEventListener("click", () => {
       const color = btn.getAttribute("data-color");
@@ -161,7 +161,7 @@ function setupToolbar() {
     });
   }
 
-  // Download (plain text)
+  // Download
   const downloadBtn = document.getElementById("downloadDocx");
   if (downloadBtn) {
     downloadBtn.addEventListener("click", () => {
@@ -209,7 +209,6 @@ function setupFloatingToolbarBehavior() {
     }, 600);
   });
 
-  // Show initially when page loads
   showBar();
 }
 
