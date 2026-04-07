@@ -227,3 +227,33 @@ select {
   font-size: 0.8rem;
   color: var(--muted);
 }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.toolbar button {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+
+.rich-editor {
+  width: 100%;
+  min-height: 70vh;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  font-size: 1rem;
+  line-height: 1.6;
+  background: var(--bg-alt);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.rich-editor:focus {
+  outline: none;
+  border-color: var(--accent);
+}
