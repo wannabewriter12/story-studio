@@ -5,37 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Story Editor</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="themes.css">
 </head>
 
-<body>
-
-  <!-- LOADER -->
+<body class="theme-pastel">
+  <!-- Loader -->
   <div id="loader">
     <div class="dot dot1"></div>
     <div class="dot dot2"></div>
     <div class="dot dot3"></div>
   </div>
 
-  <header class="editor-header">
-    <div class="toolbar">
+  <header class="editor-top-bar">
+    <div class="left">
+      <a href="index.html" class="back-link">← Stories</a>
+    </div>
 
-      <!-- Formatting buttons -->
-      <button data-cmd="bold"><b>B</b></button>
-      <button data-cmd="italic"><i>I</i></button>
-      <button data-cmd="underline"><u>U</u></button>
-      <button data-cmd="strikeThrough">S</button>
+    <div class="center toolbar">
+      <button data-cmd="bold" class="btn icon"><b>B</b></button>
+      <button data-cmd="italic" class="btn icon"><i>I</i></button>
+      <button data-cmd="underline" class="btn icon"><u>U</u></button>
+      <button data-cmd="strikeThrough" class="btn icon">S</button>
 
-      <!-- Font family -->
-      <select id="fontFamily">
+      <select id="fontFamily" class="select small">
         <option value="">Font</option>
         <option value="Arial">Arial</option>
         <option value="Georgia">Georgia</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
+        <option value="Times New Roman">Times</option>
+        <option value="Courier New">Courier</option>
       </select>
 
-      <!-- Font size -->
-      <select id="fontSize">
+      <select id="fontSize" class="select small">
         <option value="">Size</option>
         <option value="2">Small</option>
         <option value="3">Normal</option>
@@ -43,29 +43,25 @@
         <option value="5">XL</option>
       </select>
 
-      <!-- Color picker -->
-      <input type="color" id="colorPicker">
+      <input type="color" id="colorPicker" class="color-input">
 
-      <!-- Color palette -->
-      <div id="colorPalette">
-        <button data-color="#ffb3c6"></button>
-        <button data-color="#c8b5ff"></button>
-        <button data-color="#8ecaff"></button>
-        <button data-color="#a8f0c6"></button>
+      <div id="colorPalette" class="color-palette">
+        <button data-color="#ffb3c6" class="swatch"></button>
+        <button data-color="#c8b5ff" class="swatch"></button>
+        <button data-color="#8ecaff" class="swatch"></button>
+        <button data-color="#a8f0c6" class="swatch"></button>
       </div>
-
-      <!-- Download -->
-      <button id="downloadDocx">Download</button>
     </div>
 
-    <div class="editor-status">
-      <span id="status">Saved</span>
-      <span id="wordCount">0 words</span>
+    <div class="right editor-meta">
+      <span id="status" class="status-pill">Saved</span>
+      <span id="wordCount" class="word-count">0 words</span>
+      <button id="downloadDocx" class="btn ghost small">Download</button>
     </div>
   </header>
 
-  <main>
-    <div id="editor" contenteditable="true" class="editor-area"></div>
+  <main class="editor-main">
+    <div id="editor" class="editor-area" contenteditable="true"></div>
   </main>
 
   <script src="editor.js"></script>
