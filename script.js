@@ -153,3 +153,4 @@ function createNewStory() {
 
   window.location.href = `story.html?id=${encodeURIComponent(id)}`;
 }
+hideLoader();
