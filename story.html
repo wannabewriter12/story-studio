@@ -4,66 +4,64 @@
   <meta charset="UTF-8" />
   <title>Story Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@400;600&family=Source+Serif+Pro:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body class="theme-minimal">
-  <header>
-    <h1>Story Editor</h1>
-  </header>
 
-  <main>
-    <div id="toolbar">
-      <select id="fontFamily">
-        <option value="">Font</option>
-        <option value="Inter, sans-serif">Inter</option>
-        <option value="'Playfair Display', serif">Playfair Display</option>
-        <option value="'Source Serif Pro', serif">Source Serif Pro</option>
-        <option value="'Courier New', monospace">Typewriter</option>
-      </select>
+  <!-- Floating Toolbar -->
+  <div id="toolbar">
 
-      <select id="fontSize">
-        <option value="">Size</option>
-        <option value="2">Small</option>
-        <option value="3">Normal</option>
-        <option value="4">Large</option>
-        <option value="5">Huge</option>
-      </select>
+    <select id="fontFamily">
+      <option value="">Font</option>
+      <option value="Inter, sans-serif">Inter</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Source Serif Pro', serif">Source Serif Pro</option>
+      <option value="'Courier New', monospace">Typewriter</option>
+    </select>
 
-      <button data-cmd="bold"><b>B</b></button>
-      <button data-cmd="italic"><i>I</i></button>
+    <select id="fontSize">
+      <option value="">Size</option>
+      <option value="2">Small</option>
+      <option value="3">Normal</option>
+      <option value="4">Large</option>
+      <option value="5">Huge</option>
+    </select>
 
-      <button data-cmd="justifyLeft">Left</button>
-      <button data-cmd="justifyCenter">Center</button>
-      <button data-cmd="justifyRight">Right</button>
+    <button data-cmd="bold"><b>B</b></button>
+    <button data-cmd="italic"><i>I</i></button>
 
-      <input type="color" id="colorPicker" />
+    <button data-cmd="justifyLeft">L</button>
+    <button data-cmd="justifyCenter">C</button>
+    <button data-cmd="justifyRight">R</button>
 
-      <div id="colorPalette">
-        <button data-color="#000000" style="background:#000000;"></button>
-        <button data-color="#ff0000" style="background:#ff0000;"></button>
-        <button data-color="#0055ff" style="background:#0055ff;"></button>
-        <button data-color="#00aa55" style="background:#00aa55;"></button>
-        <button data-color="#8000ff" style="background:#8000ff;"></button>
+    <input type="color" id="colorPicker" />
 
-        <button data-color="#ff8ba7" style="background:#ff8ba7;"></button>
-        <button data-color="#c3a6ff" style="background:#c3a6ff;"></button>
-        <button data-color="#8ecaff" style="background:#8ecaff;"></button>
-        <button data-color="#a8ffd6" style="background:#a8ffd6;"></button>
-        <button data-color="#ffd6a5" style="background:#ffd6a5;"></button>
-        <button data-color="#ffd700" style="background:#ffd700;"></button>
-      </div>
+    <div id="colorPalette">
+      <button data-color="#000000" style="background:#000000;"></button>
+      <button data-color="#ff0000" style="background:#ff0000;"></button>
+      <button data-color="#0055ff" style="background:#0055ff;"></button>
+      <button data-color="#00aa55" style="background:#00aa55;"></button>
+      <button data-color="#8000ff" style="background:#8000ff;"></button>
 
-      <button id="downloadDocx">Download .docx</button>
-
-      <span id="wordCount">0 words</span>
-      <span id="status">Saved</span>
+      <button data-color="#ff8ba7" style="background:#ff8ba7;"></button>
+      <button data-color="#c3a6ff" style="background:#c3a6ff;"></button>
+      <button data-color="#8ecaff" style="background:#8ecaff;"></button>
+      <button data-color="#a8ffd6" style="background:#a8ffd6;"></button>
+      <button data-color="#ffd6a5" style="background:#ffd6a5;"></button>
+      <button data-color="#ffd700" style="background:#ffd700;"></button>
     </div>
 
+    <button id="downloadDocx">Download</button>
+
+    <span id="wordCount">0 words</span>
+    <span id="status">Saved</span>
+  </div>
+
+  <main>
     <div id="editor" contenteditable="true"></div>
   </main>
 
   <script src="editor.js"></script>
 </body>
 </html>
-
