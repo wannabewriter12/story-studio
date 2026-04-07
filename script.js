@@ -1,8 +1,11 @@
 // LOADER
 function hideLoader() {
   const loader = document.getElementById("loader");
-  if (loader) loader.classList.add("fade-out");
-  setTimeout(() => loader && (loader.style.display = "none"), 300);
+  if (!loader) return;
+  loader.classList.add("fade-out");
+  setTimeout(() => {
+    loader.style.display = "none";
+  }, 300);
 }
 
 // THEME
@@ -13,10 +16,14 @@ function loadTheme() {
   if (select) select.value = saved;
 }
 
-function changeTheme() {
-  const theme = document.getElementById("themeSelect").value;
-  document.body.className = theme;
-  localStorage.setItem("storyTheme", theme);
+function setupThemeSwitcher() {
+  const select = document.getElementById("themeSelect");
+  if (!select) return;
+  select.addEventListener("change", () => {
+    const value = select.value || "theme-pastel";
+    document.body.className = value;
+    localStorage.setItem("storyTheme", value);
+  });
 }
 
 // STORAGE
@@ -28,120 +35,163 @@ function saveStories(stories) {
   localStorage.setItem("stories", JSON.stringify(stories));
 }
 
-// RENDER LIST
+// RENDER STORIES
 function renderStories() {
-  const list = document.getElementById("storiesList");
+  const container = document.getElementById("storiesList");
+  if (!container) return;
+
   const stories = loadStories();
+  container.innerHTML = "";
 
-  list.innerHTML = "";
-
-  if (stories.length === 0) {
-    list.innerHTML = `<p class="empty">No stories yet. Click “New story” to begin.</p>`;
+  if (!stories.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "No stories yet. Create your first one!";
+    container.appendChild(empty);
     return;
   }
 
   stories
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .forEach(story => {
-      const item = document.createElement("article");
-      item.className = "story-card";
-      item.innerHTML = `
-        <div class="story-main">
-          <h3>${story.title || "Untitled story"}</h3>
-          <p class="story-snippet">${(story.plainText || "").slice(0, 120) || "No content yet."}</p>
-        </div>
-        <div class="story-meta">
-          <span class="timestamp">${new Date(story.updatedAt).toLocaleString()}</span>
-          <div class="story-actions">
-            <button class="btn small primary open-btn" data-id="${story.id}">Open</button>
-            <button class="btn small ghost delete-btn" data-id="${story.id}">Delete</button>
-          </div>
-        </div>
-      `;
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+    .forEach((story) => {
+      const card = document.createElement("div");
+      card.className = "story-card";
 
-      item.querySelector(".open-btn").addEventListener("click", () => {
+      const title = document.createElement("h3");
+      title.textContent = story.title || "Untitled story";
+
+      const snippet = document.createElement("p");
+      snippet.className = "story-snippet";
+      snippet.textContent = (story.plainText || "").slice(0, 120) || "No content yet.";
+
+      const meta = document.createElement("div");
+      meta.className = "story-meta";
+
+      const date = document.createElement("span");
+      const d = new Date(story.updatedAt || story.createdAt);
+      date.textContent = isNaN(d) ? "" : d.toLocaleString();
+
+      const actions = document.createElement("div");
+      actions.className = "story-actions";
+
+      const openBtn = document.createElement("button");
+      openBtn.className = "btn ghost small";
+      openBtn.textContent = "Open";
+      openBtn.addEventListener("click", () => {
         window.location.href = `story.html?id=${encodeURIComponent(story.id)}`;
       });
 
-      item.querySelector(".delete-btn").addEventListener("click", () => {
-        deleteStory(story.id);
+      const renameBtn = document.createElement("button");
+      renameBtn.className = "btn ghost small";
+      renameBtn.textContent = "Rename";
+      renameBtn.addEventListener("click", () => {
+        const newTitle = prompt("New title:", story.title || "Untitled story");
+        if (newTitle === null) return;
+        story.title = newTitle.trim() || "Untitled story";
+        saveStories(stories);
+        renderStories();
       });
 
-      list.appendChild(item);
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn ghost small";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.addEventListener("click", () => {
+        if (!confirm("Delete this story?")) return;
+        const filtered = stories.filter((s) => s.id !== story.id);
+        saveStories(filtered);
+        renderStories();
+      });
+
+      actions.appendChild(openBtn);
+      actions.appendChild(renameBtn);
+      actions.appendChild(deleteBtn);
+
+      meta.appendChild(date);
+      meta.appendChild(actions);
+
+      card.appendChild(title);
+      card.appendChild(snippet);
+      card.appendChild(meta);
+
+      container.appendChild(card);
     });
 }
 
-// CREATE STORY
-function createNewStory() {
-  const stories = loadStories();
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
+// NEW STORY
+function setupNewStoryButton() {
+  const btn = document.getElementById("newStoryBtn");
+  if (!btn) return;
 
-  const newStory = {
-    id,
-    title: "Untitled story",
-    content: "",
-    plainText: "",
-    createdAt: now,
-    updatedAt: now
-  };
+  btn.addEventListener("click", () => {
+    const stories = loadStories();
+    const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+    const now = new Date().toISOString();
 
-  stories.push(newStory);
-  saveStories(stories);
-  window.location.href = `story.html?id=${encodeURIComponent(id)}`;
-}
+    const story = {
+      id,
+      title: "Untitled story",
+      content: "",
+      plainText: "",
+      createdAt: now,
+      updatedAt: now
+    };
 
-// DELETE STORY
-function deleteStory(id) {
-  if (!confirm("Delete this story?")) return;
-  let stories = loadStories();
-  stories = stories.filter(s => s.id !== id);
-  saveStories(stories);
-  renderStories();
+    stories.push(story);
+    saveStories(stories);
+    window.location.href = `story.html?id=${encodeURIComponent(id)}`;
+  });
 }
 
 // BACKUP / IMPORT
-function downloadBackup() {
-  const data = localStorage.getItem("stories") || "[]";
-  const blob = new Blob([data], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+function setupBackupImport() {
+  const backupBtn = document.getElementById("backupBtn");
+  const importBtn = document.getElementById("importBtn");
+  const importFile = document.getElementById("importFile");
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "stories-backup.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
+  if (backupBtn) {
+    backupBtn.addEventListener("click", () => {
+      const stories = loadStories();
+      const blob = new Blob([JSON.stringify(stories, null, 2)], {
+        type: "application/json"
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "story-studio-backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
 
-function importBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  if (importBtn && importFile) {
+    importBtn.addEventListener("click", () => importFile.click());
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const stories = JSON.parse(reader.result);
-      if (!Array.isArray(stories)) throw new Error();
-      saveStories(stories);
-      renderStories();
-    } catch {
-      alert("Invalid backup file.");
-    }
-  };
-  reader.readAsText(file);
+    importFile.addEventListener("change", () => {
+      const file = importFile.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!Array.isArray(data)) throw new Error("Invalid backup format");
+          saveStories(data);
+          renderStories();
+          alert("Backup imported successfully.");
+        } catch (e) {
+          alert("Could not import backup.");
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
 }
 
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
   hideLoader();
   loadTheme();
+  setupThemeSwitcher();
+  setupNewStoryButton();
+  setupBackupImport();
   renderStories();
-
-  document.getElementById("newStoryBtn").addEventListener("click", createNewStory);
-  document.getElementById("backupBtn").addEventListener("click", downloadBackup);
-  document.getElementById("importBtn").addEventListener("click", () =>
-    document.getElementById("importFile").click()
-  );
-  document.getElementById("importFile").addEventListener("change", importBackup);
-  document.getElementById("themeSelect").addEventListener("change", changeTheme);
 });
