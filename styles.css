@@ -1,17 +1,19 @@
+/* RESET */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
+/* GLOBAL */
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: "Quicksand", system-ui, sans-serif;
   background: #fdfbff;
   color: #222;
   min-height: 100vh;
 }
 
-/* Loader */
+/* LOADER */
 #loader {
   position: fixed;
   inset: 0;
@@ -44,14 +46,14 @@ body {
   to { transform: translateY(-8px); opacity: 1; }
 }
 
-/* Buttons, selects */
+/* BUTTONS */
 .btn {
   border: none;
   border-radius: 999px;
   padding: 0.45rem 0.9rem;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
+  transition: 0.15s ease;
 }
 
 .btn.primary {
@@ -79,6 +81,7 @@ body {
   padding: 0.25rem 0.5rem;
 }
 
+/* SELECTS */
 .select {
   border-radius: 999px;
   border: 1px solid rgba(180, 160, 230, 0.5);
@@ -91,6 +94,7 @@ body {
   font-size: 0.8rem;
 }
 
+/* COLOR INPUT */
 .color-input {
   border-radius: 999px;
   border: 1px solid rgba(180, 160, 230, 0.5);
@@ -98,7 +102,7 @@ body {
   background: white;
 }
 
-/* Layout */
+/* TOP BAR */
 .top-bar,
 .editor-top-bar {
   display: flex;
@@ -117,12 +121,7 @@ body {
   letter-spacing: 0.04em;
 }
 
-.top-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
+/* MAIN LAYOUT */
 .main-layout {
   padding: 1.4rem;
   max-width: 900px;
@@ -143,6 +142,7 @@ body {
   margin-bottom: 0.8rem;
 }
 
+/* STORY LIST */
 .story-list {
   display: flex;
   flex-direction: column;
@@ -150,18 +150,25 @@ body {
 }
 
 .story-card {
-  padding: 0.8rem 0.9rem;
-  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(210, 190, 240, 0.6);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  transition: 0.15s ease;
 }
 
-.story-main h3 {
+.story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(180, 150, 230, 0.2);
+}
+
+.story-card h3 {
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 0.2rem;
 }
 
 .story-snippet {
@@ -181,12 +188,7 @@ body {
   gap: 0.3rem;
 }
 
-.empty {
-  font-size: 0.9rem;
-  color: #777;
-}
-
-/* Editor page */
+/* EDITOR PAGE */
 .editor-top-bar .left,
 .editor-top-bar .center,
 .editor-top-bar .right {
@@ -198,34 +200,6 @@ body {
 .editor-top-bar .center {
   flex: 1;
   justify-content: center;
-}
-
-.editor-top-bar .right {
-  justify-content: flex-end;
-}
-
-.back-link {
-  text-decoration: none;
-  font-size: 0.9rem;
-  color: #5b4a9a;
-}
-
-.editor-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.status-pill {
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(200, 181, 255, 0.2);
-  font-size: 0.75rem;
-}
-
-.word-count {
-  font-size: 0.75rem;
-  color: #555;
 }
 
 .editor-main {
@@ -243,10 +217,11 @@ body {
   box-shadow: 0 10px 30px rgba(180, 150, 230, 0.15);
   outline: none;
   line-height: 1.6;
-  font-size: 0.98rem;
+  font-size: 1rem;
+  font-family: "Inter", sans-serif;
 }
 
-/* Color palette */
+/* COLOR PALETTE */
 .color-palette {
   display: flex;
   gap: 0.25rem;
@@ -260,7 +235,7 @@ body {
   cursor: pointer;
 }
 
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 720px) {
   .top-bar,
   .editor-top-bar {
@@ -281,3 +256,4 @@ body {
     padding: 1rem;
   }
 }
+
