@@ -140,4 +140,16 @@ function createNewStory() {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  const new
+  const newStory = {
+    id,
+    title: "Untitled story",
+    content: "",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  stories.push(newStory);
+  saveStories(stories);
+
+  window.location.href = `story.html?id=${encodeURIComponent(id)}`;
+}
