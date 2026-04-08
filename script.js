@@ -160,6 +160,7 @@ function setupBackupImport() {
   const importBtn = document.getElementById("importBtn");
   const importFile = document.getElementById("importFile");
 
+  // Backup
   if (backupBtn) {
     backupBtn.addEventListener("click", () => {
       const stories = loadStories();
@@ -175,14 +176,90 @@ function setupBackupImport() {
     });
   }
 
+  // Import
   if (importBtn && importFile) {
     importBtn.addEventListener("click", () => importFile.click());
 
     importFile.addEventListener("change", () => {
       const file = importFile.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
-          if (!
+          if (!Array.isArray(data)) throw new Error("Invalid backup format");
+
+          saveStories(data);
+          renderStories();
+          alert("Backup imported successfully.");
+        } catch (e) {
+          alert("Could not import backup.");
+        }
+      };
+
+      reader.readAsText(file);
+    });
+  }
+}
+
+// =========================
+// Intro modal (first-time only)
+// =========================
+function setupIntroModal() {
+  const modal = document.getElementById("introModal");
+  if (!modal) return;
+
+  const slide1 = document.getElementById("introSlide1");
+  const slide2 = document.getElementById("introSlide2");
+  const slide3 = document.getElementById("introSlide3");
+  const closeBtn = document.getElementById("introClose");
+
+  if (!slide1 || !slide2 || !slide3 || !closeBtn) return;
+
+  const hasSeenIntro = localStorage.getItem("seenIntro");
+
+  if (!hasSeenIntro) {
+    modal.classList.remove("hidden");
+  }
+
+  const slides = [slide1, slide2, slide3];
+  let current = 0;
+
+  function showSlide(i) {
+    slides.forEach((s, idx) => {
+      s.classList.toggle("hidden", idx !== i);
+    });
+  }
+
+  document.querySelectorAll(".intro-next").forEach(btn => {
+    btn.addEventListener("click", () => {
+      current++;
+      if (current >= slides.length) {
+        modal.classList.add("hidden");
+        localStorage.setItem("seenIntro", "true");
+      } else {
+        showSlide(current);
+      }
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    localStorage.setItem("seenIntro", "true");
+  });
+}
+
+// =========================
+// Init
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+  hideLoader();
+  loadTheme();
+  setupThemeSwitcher();
+  setupNewStoryButton();
+  setupBackupImport();
+  renderStories();
+  setupIntroModal();
+});
+
