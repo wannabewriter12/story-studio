@@ -264,6 +264,15 @@ function setupToolbar() {
     });
   }
 }
+function placeCaretAtEnd(el) {
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
 
 // =========================
 // Floating toolbar behavior
@@ -287,6 +296,26 @@ function setupFloatingToolbarBehavior() {
   editor.addEventListener("blur", hideBar);
 
   editor.addEventListener("input", () => {
+  // Clean RTL markers automatically
+  const cleaned = stripRTL(editor.innerHTML);
+  if (cleaned !== editor.innerHTML) {
+    editor.innerHTML = cleaned;
+    placeCaretAtEnd(editor); // keep cursor in correct place
+  }
+
+  hideBar();
+  const status = document.getElementById("status");
+  if (status) status.textContent = "Saving...";
+  updateWordCount();
+
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    showBar();
+  }, 600);
+
+  scanForSuggestions();
+});
+
     hideBar();
     const status = document.getElementById("status");
     if (status) status.textContent = "Saving...";
