@@ -50,8 +50,8 @@ const localSynonyms = {
 // =========================
 // AI suggestion (fallback)
 // =========================
-// NOTE: Replace YOUR_API_ENDPOINT_HERE with your real endpoint if you use AI.
-// If you don't have one yet, this will just return null and local synonyms will still work.
+// Replace YOUR_API_ENDPOINT_HERE if you want AI suggestions.
+// If not, local synonyms still work perfectly.
 async function getAISuggestion(text) {
   try {
     const response = await fetch("YOUR_API_ENDPOINT_HERE", {
@@ -90,7 +90,7 @@ function loadStory() {
   const editor = document.getElementById("editor");
   editor.innerHTML = currentStory.content || "";
   updateWordCount();
-  scanForSuggestions(); // initial scan
+  scanForSuggestions();
 }
 
 // =========================
@@ -144,8 +144,6 @@ function scanForSuggestions() {
   Object.keys(localSynonyms).forEach((word) => {
     const regex = new RegExp(`\\b${word}\\b`, "gi");
     html = html.replace(regex, (match) => {
-      // If the synonym is the same as the word, we still wrap it
-      // so AI can upgrade it later.
       const suggestion = localSynonyms[word] || match;
       return `<span class="suggestion" data-suggestion="${suggestion}">${match}</span>`;
     });
@@ -162,7 +160,7 @@ function setupToolbar() {
 
   // Top toolbar buttons
   document.querySelectorAll("[data-cmd]").forEach((btn) => {
-    if (btn.closest(".floating-toolbar")) return; // floating handled separately
+    if (btn.closest(".floating-toolbar")) return;
     btn.addEventListener("click", () => {
       const cmd = btn.getAttribute("data-cmd");
       if (!cmd) return;
@@ -172,7 +170,7 @@ function setupToolbar() {
     });
   });
 
-  // Font family (top)
+  // Font family
   const fontFamily = document.getElementById("fontFamily");
   if (fontFamily) {
     fontFamily.addEventListener("change", (e) => {
@@ -184,7 +182,7 @@ function setupToolbar() {
     });
   }
 
-  // Font size (top)
+  // Font size
   const fontSize = document.getElementById("fontSize");
   if (fontSize) {
     fontSize.addEventListener("change", (e) => {
@@ -196,7 +194,7 @@ function setupToolbar() {
     });
   }
 
-  // Color picker (top)
+  // Color picker
   const colorPicker = document.getElementById("colorPicker");
   if (colorPicker) {
     colorPicker.addEventListener("input", (e) => {
@@ -206,7 +204,7 @@ function setupToolbar() {
     });
   }
 
-  // Palette (top)
+  // Palette
   document.querySelectorAll("#colorPalette .swatch").forEach((btn) => {
     btn.addEventListener("click", () => {
       const color = btn.getAttribute("data-color");
@@ -250,7 +248,7 @@ function setupToolbar() {
     });
   }
 
-  // Download (plain text)
+  // Download
   const downloadBtn = document.getElementById("downloadDocx");
   if (downloadBtn) {
     downloadBtn.addEventListener("click", () => {
@@ -299,11 +297,9 @@ function setupFloatingToolbarBehavior() {
       showBar();
     }, 600);
 
-    // Scan for suggestions as you type
     scanForSuggestions();
   });
 
-  // Show initially
   showBar();
 }
 
@@ -317,7 +313,6 @@ document.addEventListener("mouseover", async (e) => {
   const original = span.innerText.trim();
   const currentSuggestion = span.getAttribute("data-suggestion") || original;
 
-  // If local suggestion is basically the same as original, try AI
   if (currentSuggestion.toLowerCase() === original.toLowerCase()) {
     const ai = await getAISuggestion(original);
     if (ai) span.setAttribute("data-suggestion", ai);
@@ -336,6 +331,54 @@ document.addEventListener("click", (e) => {
 });
 
 // =========================
+// Intro modal support
+// =========================
+function setupIntroModal() {
+  const modal = document.getElementById("introModal");
+  if (!modal) return;
+
+  const hasSeenIntro = localStorage.getItem("seenIntro");
+
+  if (!hasSeenIntro) {
+    modal.classList.remove("hidden");
+  }
+
+  const slides = [
+    document.getElementById("introSlide1"),
+    document.getElementById("introSlide2"),
+    document.getElementById("introSlide3")
+  ];
+
+  let current = 0;
+
+  function showSlide(i) {
+    slides.forEach((s, idx) => {
+      s.classList.toggle("hidden", idx !== i);
+    });
+  }
+
+  document.querySelectorAll(".intro-next").forEach(btn => {
+    btn.addEventListener("click", () => {
+      current++;
+      if (current >= slides.length) {
+        modal.classList.add("hidden");
+        localStorage.setItem("seenIntro", "true");
+      } else {
+        showSlide(current);
+      }
+    });
+  });
+
+  const closeBtn = document.getElementById("introClose");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+      localStorage.setItem("seenIntro", "true");
+    });
+  }
+}
+
+// =========================
 // Init
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
@@ -346,5 +389,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFloatingToolbarBehavior();
   updateWordCount();
   scanForSuggestions();
+  setupIntroModal();
 });
-
