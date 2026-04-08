@@ -1,4 +1,6 @@
-// LOADER
+// =========================
+// Loader
+// =========================
 function hideLoader() {
   const loader = document.getElementById("loader");
   if (!loader) return;
@@ -8,7 +10,9 @@ function hideLoader() {
   }, 300);
 }
 
-// THEME
+// =========================
+// Theme
+// =========================
 function loadTheme() {
   const saved = localStorage.getItem("storyTheme") || "theme-pastel";
   document.body.className = saved;
@@ -26,7 +30,9 @@ function setupThemeSwitcher() {
   });
 }
 
-// STORAGE
+// =========================
+// Storage
+// =========================
 function loadStories() {
   return JSON.parse(localStorage.getItem("stories") || "[]");
 }
@@ -35,7 +41,9 @@ function saveStories(stories) {
   localStorage.setItem("stories", JSON.stringify(stories));
 }
 
-// RENDER STORIES
+// =========================
+// Render stories
+// =========================
 function renderStories() {
   const container = document.getElementById("storiesList");
   if (!container) return;
@@ -117,7 +125,9 @@ function renderStories() {
     });
 }
 
-// NEW STORY
+// =========================
+// New story
+// =========================
 function setupNewStoryButton() {
   const btn = document.getElementById("newStoryBtn");
   if (!btn) return;
@@ -142,7 +152,9 @@ function setupNewStoryButton() {
   });
 }
 
-// BACKUP / IMPORT
+// =========================
+// Backup / Import
+// =========================
 function setupBackupImport() {
   const backupBtn = document.getElementById("backupBtn");
   const importBtn = document.getElementById("importBtn");
@@ -173,25 +185,4 @@ function setupBackupImport() {
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
-          if (!Array.isArray(data)) throw new Error("Invalid backup format");
-          saveStories(data);
-          renderStories();
-          alert("Backup imported successfully.");
-        } catch (e) {
-          alert("Could not import backup.");
-        }
-      };
-      reader.readAsText(file);
-    });
-  }
-}
-
-// INIT
-document.addEventListener("DOMContentLoaded", () => {
-  hideLoader();
-  loadTheme();
-  setupThemeSwitcher();
-  setupNewStoryButton();
-  setupBackupImport();
-  renderStories();
-});
+          if (!
