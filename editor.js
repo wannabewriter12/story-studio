@@ -377,6 +377,15 @@ function setupIntroModal() {
     });
   }
 }
+// =========================
+// Fix hidden RTL markers
+// =========================
+function stripRTL(text) {
+  if (!text) return text;
+
+  // Remove Unicode RTL/LTR control characters
+  return text.replace(/[\u202A\u202B\u202D\u202E\u202C\u2066\u2067\u2068\u2069]/g, "");
+}
 
 // =========================
 // Init
